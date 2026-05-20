@@ -67,6 +67,10 @@ function parseWaitlistPayload(body, contentType) {
   return Object.fromEntries(params.entries());
 }
 
+function isEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 async function handleWaitlist(request, response) {
   if (request.method !== 'POST') {
     sendJson(response, 405, { error: 'Method not allowed' });
@@ -90,15 +94,21 @@ async function handleWaitlist(request, response) {
       return;
     }
 
+    const formspreePayload = {
+      emailOrPhone,
+      source: 'pullupapp.co',
+      submittedAt: new Date().toISOString()
+    };
+
+    if (isEmail(emailOrPhone)) {
+      formspreePayload.email = emailOrPhone;
+    }
+
     try {
       const webhookResponse = await fetch(waitlistWebhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          emailOrPhone,
-          source: 'pullupapp.co',
-          submittedAt: new Date().toISOString()
-        })
+        body: JSON.stringify(formspreePayload)
       });
 
       if (!webhookResponse.ok) {
