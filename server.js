@@ -6,6 +6,7 @@ const { URL } = require('node:url');
 const port = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, 'dist');
 const fallbackFile = path.join(publicDir, 'index.html');
+const waitlistWebhookUrl = process.env.WAITLIST_WEBHOOK_URL;
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -35,8 +36,88 @@ function sendFile(response, filePath) {
   });
 }
 
+function sendJson(response, statusCode, payload) {
+  response.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-cache'
+  });
+  response.end(JSON.stringify(payload));
+}
+
+function readRequestBody(request, callback) {
+  let body = '';
+
+  request.on('data', (chunk) => {
+    body += chunk;
+
+    if (body.length > 10000) {
+      request.destroy();
+    }
+  });
+
+  request.on('end', () => callback(body));
+}
+
+async function handleWaitlist(request, response) {
+  if (request.method !== 'POST') {
+    sendJson(response, 405, { error: 'Method not allowed' });
+    return;
+  }
+
+  readRequestBody(request, async (body) => {
+    let payload;
+
+    try {
+      payload = JSON.parse(body || '{}');
+    } catch (error) {
+      sendJson(response, 400, { error: 'Invalid JSON' });
+      return;
+    }
+
+    const emailOrPhone = String(payload.emailOrPhone || '').trim();
+
+    if (!emailOrPhone) {
+      sendJson(response, 400, { error: 'Email or phone is required' });
+      return;
+    }
+
+    if (!waitlistWebhookUrl) {
+      console.log('Waitlist signup received. Set WAITLIST_WEBHOOK_URL to forward it:', emailOrPhone);
+      sendJson(response, 503, { error: 'Waitlist endpoint is not configured' });
+      return;
+    }
+
+    try {
+      const webhookResponse = await fetch(waitlistWebhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          emailOrPhone,
+          source: 'pullupapp.co',
+          submittedAt: new Date().toISOString()
+        })
+      });
+
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook responded with ${webhookResponse.status}`);
+      }
+
+      sendJson(response, 200, { ok: true });
+    } catch (error) {
+      console.error('Waitlist webhook failed:', error);
+      sendJson(response, 502, { error: 'Waitlist submission failed' });
+    }
+  });
+}
+
 const server = http.createServer((request, response) => {
   const url = new URL(request.url, `http://${request.headers.host || 'localhost'}`);
+
+  if (url.pathname === '/api/waitlist') {
+    handleWaitlist(request, response);
+    return;
+  }
+
   const decodedPath = decodeURIComponent(url.pathname);
   const requestedPath = decodedPath === '/' ? '/index.html' : decodedPath;
   const filePath = path.normalize(path.join(publicDir, requestedPath));

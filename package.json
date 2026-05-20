@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port ${PORT:-5173}",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0 --port ${PORT:-4173}",
+    "preview": "vite preview --host 0.0.0.0",
+    "prestart": "npm run build",
     "start": "node server.js"
   },
   "dependencies": {

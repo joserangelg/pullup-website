@@ -10,31 +10,35 @@ import {
   MapPin,
   MessageCircle,
   MousePointer2,
+  Plus,
   Radio,
   ShieldCheck,
   Sparkles,
+  Send,
+  UserRound,
   UsersRound,
   Zap,
 } from 'lucide-react';
+import { useState } from 'react';
 
-const waitlistEmail = 'hello@pullupapp.co';
+const waitlistEndpoint = 'https://formspree.io/f/mojbjkbn';
 
 const activitySignals = [
-  { label: 'Coffee Walk', meta: '12 nearby · Fremont', x: '68%', y: '36%', tone: 'lime' },
-  { label: 'Run Club', meta: '22 open · Green Lake', x: '24%', y: '58%', tone: 'cyan' },
-  { label: 'Creator Meet', meta: '6 spots · Belltown', x: '58%', y: '70%', tone: 'violet' },
+  { label: 'Rooftop Hangout', meta: 'starts in 22 min · 6 mutuals', x: '68%', y: '36%', tone: 'lime' },
+  { label: 'Volleyball Game', meta: '22 open · Green Lake', x: '24%', y: '58%', tone: 'cyan' },
+  { label: 'John Summit Pregame', meta: '3 friends going · Belltown', x: '58%', y: '70%', tone: 'violet' },
 ];
 
 const howItWorks = [
   {
     icon: Radio,
     title: 'See who’s nearby',
-    body: 'Live signals show people, circles, and plans forming around you without exposing exact locations.',
+    body: 'Live signals show friends, circles, and plans forming around you without exposing exact locations.',
   },
   {
     icon: Compass,
     title: 'Find something to do',
-    body: 'Browse real plans by vibe, time, proximity, and trust signals so the next move is obvious.',
+    body: 'Browse real plans by vibe, time, proximity, and mutuals so the next move feels obvious.',
   },
   {
     icon: MousePointer2,
@@ -46,20 +50,20 @@ const howItWorks = [
 const previewCards = [
   {
     eyebrow: 'Map view',
-    title: 'Live nearby signals',
-    body: 'Soft-radius discovery with moving activity pulses.',
+    title: 'The move, on a map',
+    body: 'Soft-radius signals show where real-life energy is building.',
     icon: MapPin,
   },
   {
     eyebrow: 'LIVE mode',
-    title: 'What is happening now',
-    body: 'A real-time layer for friends, circles, and open plans.',
+    title: 'Before it is over',
+    body: 'See plans while they are still forming, not after the recap.',
     icon: Zap,
   },
   {
     eyebrow: 'Invite flow',
     title: 'RSVP from a link',
-    body: 'Going, Maybe, or No before the app gate.',
+    body: 'Going, Maybe, or No from the preview. Details open in PullUp.',
     icon: Link2,
   },
   {
@@ -71,9 +75,27 @@ const previewCards = [
 ];
 
 const liveFeed = [
-  ['Ana joined Coffee Walk', '4 mutuals nearby'],
-  ['Rooftop Recovery opened', '18 active'],
-  ['Leo needs two more', 'Sports crew'],
+  ['Maya joined Rooftop Hangout', 'starts in 22 min'],
+  ['Volleyball Game opened', '22 nearby · 4 spots'],
+  ['Leo dropped John Summit Pregame', '3 friends going'],
+];
+
+const appScreens = [
+  {
+    type: 'map',
+    eyebrow: 'Map',
+    title: 'See what is nearby.',
+  },
+  {
+    type: 'details',
+    eyebrow: 'Details',
+    title: 'Know before you go.',
+  },
+  {
+    type: 'pulse',
+    eyebrow: 'Pulse',
+    title: 'Drop, chat, and move.',
+  },
 ];
 
 function Logo() {
@@ -81,13 +103,53 @@ function Logo() {
 }
 
 function WaitlistForm({ compact = false }) {
+  const [status, setStatus] = useState('idle');
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const emailOrPhone = String(formData.get('emailOrPhone') || '').trim();
+
+    if (!emailOrPhone) return;
+
+    setStatus('loading');
+
+    try {
+      const response = await fetch(waitlistEndpoint, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          emailOrPhone,
+          source: 'pullupapp.co',
+        }),
+      });
+
+      if (!response.ok) throw new Error('Waitlist unavailable');
+
+      form.reset();
+      setStatus('success');
+    } catch (error) {
+      setStatus('error');
+    }
+  }
+
   return (
-    <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} action={`mailto:${waitlistEmail}`} method="post" encType="text/plain">
-      <input name="email" type="email" placeholder="Email or phone" aria-label="Email or phone" required />
-      <button type="submit">
-        Join waitlist
-        <ArrowRight size={18} />
-      </button>
+    <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} onSubmit={handleSubmit}>
+      <div className="waitlist-control">
+        <input name="emailOrPhone" type="text" placeholder="Email or phone" aria-label="Email or phone" required />
+        <button type="submit" disabled={status === 'loading'}>
+          {status === 'loading' ? 'Joining...' : 'Get early access'}
+          <ArrowRight size={18} />
+        </button>
+      </div>
+      <p className={`form-status ${status}`}>
+        {status === 'success' && 'You’re on the list.'}
+        {status === 'error' && 'Something did not go through. Try again in a moment.'}
+      </p>
     </form>
   );
 }
@@ -117,7 +179,7 @@ function SignalMap() {
 
 function PhoneMockup() {
   return (
-    <div className="phone-mockup">
+    <div className="phone-mockup iphone-frame">
       <div className="phone-bar" />
       <div className="phone-header">
         <Logo />
@@ -127,60 +189,216 @@ function PhoneMockup() {
       <div className="phone-sheet">
         <div className="sheet-handle" />
         <p className="eyebrow">Nearby now</p>
-        <h3>Coffee Walk</h3>
-        <p>Fremont · 3:30 PM · 4 mutuals</p>
+        <h3>Rooftop Hangout</h3>
+        <p>Starts in 22 min · 6 mutuals going</p>
         <div className="mini-proof">
-          <span><UsersRound size={14} /> 12 nearby</span>
-          <span><LockKeyhole size={14} /> exact after approval</span>
+          <span><UsersRound size={14} /> 18 friends nearby</span>
+          <span><LockKeyhole size={14} /> exact spot after approval</span>
         </div>
         <div className="phone-actions">
           <button>Pull Up</button>
-          <button>Share</button>
+          <button>Maybe</button>
         </div>
       </div>
+      <BottomTabs active="map" />
+    </div>
+  );
+}
+
+function BottomTabs({ active = 'map' }) {
+  const tabs = [
+    { id: 'map', label: 'Map', icon: Radio },
+    { id: 'pulse', label: 'Pulse', icon: Sparkles },
+    { id: 'drop', label: 'Drop', icon: Plus },
+    { id: 'chats', label: 'Chats', icon: MessageCircle },
+    { id: 'you', label: 'You', icon: UserRound },
+  ];
+
+  return (
+    <div className="bottom-tabs" aria-hidden="true">
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        return (
+          <span key={tab.id} className={active === tab.id ? 'active' : ''}>
+            <i><Icon size={22} /></i>
+            <b>{tab.label}</b>
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+function PreviewPhone({ type }) {
+  if (type === 'share') {
+    return (
+      <div className="preview-phone iphone-frame">
+        <div className="phone-bar" />
+        <div className="share-card in-phone">
+          <div className="share-card-top">
+            <Logo />
+            <span><Link2 size={15} /> pullupapp.co/i/rooftop</span>
+          </div>
+          <div className="share-pulse">
+            <i />
+            <i />
+            <i />
+          </div>
+          <p className="eyebrow lime">PullUp invite</p>
+          <h3>Rooftop Hangout</h3>
+          <p>Today · starts in 22 min · 6 mutuals going</p>
+          <div className="share-rsvp">
+            <button>Going</button>
+            <button>Maybe</button>
+            <button>No</button>
+          </div>
+          <button className="share-open">Open PullUp <Send size={15} /></button>
+        </div>
+      </div>
+    );
+  }
+
+  if (type === 'details') {
+    return (
+      <div className="preview-phone iphone-frame app-screen-phone">
+        <div className="phone-bar" />
+        <div className="phone-header">
+          <Logo />
+          <div className="avatar">JG</div>
+        </div>
+        <div className="details-screen">
+          <div className="screen-topline">
+            <p className="eyebrow lime">Details</p>
+            <button>Open</button>
+          </div>
+          <h3>Rooftop Hangout</h3>
+          <p>Belltown · 7:30 PM · host approval required</p>
+          <strong>Creator hang, skyline view, and open guest spots.</strong>
+          <div className="detail-pills">
+            <span>18 people looking nearby</span>
+            <span>4 spots left</span>
+          </div>
+          <div className="avatar-stack">
+            <i>MC</i>
+            <i>AR</i>
+            <i>LB</i>
+            <i>+6</i>
+            <b>18 active</b>
+          </div>
+          <div className="get-there">
+            <p className="eyebrow lime">Get there</p>
+            <div>
+              <span>Walk <b>11 min</b></span>
+              <span>Uber <b>4 min</b></span>
+              <span>Lyft <b>6 min</b></span>
+            </div>
+          </div>
+          <div className="phone-actions">
+            <button>Pull Up</button>
+            <button>Share</button>
+          </div>
+          <div className="secondary-actions">
+            <button>Preview Chat</button>
+            <button>Check in</button>
+          </div>
+        </div>
+        <BottomTabs active="map" />
+      </div>
+    );
+  }
+
+  if (type === 'pulse') {
+    return (
+      <div className="preview-phone iphone-frame app-screen-phone">
+        <div className="phone-bar" />
+        <div className="phone-header">
+          <Logo />
+          <div className="avatar">JG</div>
+        </div>
+        <div className="pulse-screen">
+          <p className="eyebrow lime">Pulse</p>
+          <h3>The city is moving.</h3>
+          <p>Fresh drops, friends joining, and open plans update here first.</p>
+          <div className="pulse-stats">
+            <span>42 friends active</span>
+            <span>18 fresh joins</span>
+            <span>7 crew chats</span>
+            <span>4 on the way</span>
+          </div>
+          <div className="vibe-row">
+            <span>🔥<b>Capitol Hill</b></span>
+            <span>🏐<b>Green Lake</b></span>
+            <span>🎵<b>Belltown</b></span>
+          </div>
+          <div className="drop-card">
+            <p className="eyebrow cyan">Drop</p>
+            <h4>Create a PullUp in seconds.</h4>
+            <span>Choose vibe, circle, host approval, and time.</span>
+          </div>
+          <div className="chat-card">
+            <p className="eyebrow lime">Chats</p>
+            <h4>Rooftop crew</h4>
+            <span>Ana: I am 6 min away. Save me a spot.</span>
+          </div>
+        </div>
+        <BottomTabs active="pulse" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="preview-phone iphone-frame">
+      <div className="phone-bar" />
+      <div className="phone-header">
+        <Logo />
+        <div className="avatar">JG</div>
+      </div>
+      <SignalMap />
+      <div className="phone-sheet">
+        <div className="sheet-handle" />
+        <p className="eyebrow">Nearby now</p>
+        <h3>Rooftop Hangout</h3>
+        <p>Starts in 22 min · 6 mutuals going</p>
+        <div className="phone-actions">
+          <button>Pull Up</button>
+          <button>Maybe</button>
+        </div>
+      </div>
+      <BottomTabs active="map" />
     </div>
   );
 }
 
 function AppPreviewShowcase() {
   return (
-    <div className="showcase-grid">
-      <article className="preview-large">
-        <div className="preview-topline">
-          <span><Radio size={16} /> LIVE</span>
-          <small>212 nearby</small>
+    <div className="phone-showcase">
+      {appScreens.map((screen) => (
+        <article key={screen.title}>
+          <PreviewPhone type={screen.type} />
+          <p className={screen.eyebrow === 'Pulse' || screen.eyebrow === 'Chats' ? 'eyebrow cyan' : 'eyebrow lime'}>{screen.eyebrow}</p>
+          <h3>{screen.title}</h3>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function ShareWindow() {
+  return (
+    <div className="share-window">
+      <PreviewPhone type="share" />
+      <div className="share-copy">
+        <p className="eyebrow cyan">Share window</p>
+        <h2>A shared PullUp should feel useful before the app opens.</h2>
+        <p>
+          A PullUp link should feel useful before someone downloads the app: clear plan, quick RSVP, mutuals, timing, and just enough social context to make opening PullUp feel worth it.
+        </p>
+        <div className="share-details">
+          <span><Check size={16} /> Going, Maybe, or No from the link</span>
+          <span><Check size={16} /> Full details and guest list inside the app</span>
+          <span><Check size={16} /> Built for iPhone, Android, and text previews</span>
         </div>
-        <SignalMap />
-      </article>
-      <article className="activity-card">
-        <p className="eyebrow cyan">Nearby activity</p>
-        {liveFeed.map(([title, meta]) => (
-          <div key={title}>
-            <span />
-            <b>{title}</b>
-            <small>{meta}</small>
-          </div>
-        ))}
-      </article>
-      <article className="invite-preview">
-        <p className="eyebrow lime">Invite flow</p>
-        <h3>Pull up to Coffee Walk?</h3>
-        <p>Tap to RSVP. Open PullUp to see who else is going.</p>
-        <div className="rsvp-row">
-          <button>Going</button>
-          <button>Maybe</button>
-          <button>No</button>
-        </div>
-      </article>
-      <article className="profile-preview">
-        <div className="profile-avatar">MC</div>
-        <div>
-          <p className="eyebrow">Profile card</p>
-          <h3>Maya Chen</h3>
-          <p>4 mutuals · IG verified · Coffee Walk</p>
-        </div>
-        <button>Pull Up</button>
-      </article>
+      </div>
     </div>
   );
 }
@@ -194,6 +412,7 @@ export default function App() {
           <a href="#what">What</a>
           <a href="#how">How</a>
           <a href="#previews">Previews</a>
+          <a href="#share">Share</a>
           <a href="#waitlist">Waitlist</a>
         </div>
       </nav>
@@ -207,31 +426,39 @@ export default function App() {
         </div>
         <div className="hero-copy">
           <div className="launch-chip"><Sparkles size={15} /> Coming soon</div>
-          <h1>See what’s happening nearby.</h1>
+          <h1>See what’s actually happening nearby.</h1>
           <p>
-            PullUp helps you discover live plans, nearby activity, and real-world connections in real time, so making a plan feels instant again.
+            Stop wondering what everyone’s doing. PullUp shows live plans, nearby activity, and people who are open to doing something now, so making real plans feels effortless.
           </p>
           <WaitlistForm />
           <div className="hero-proof">
             <span><Check size={15} /> Real plans</span>
             <span><Check size={15} /> Soft-location privacy</span>
-            <span><Check size={15} /> Live social signals</span>
+            <span><Check size={15} /> People ready now</span>
           </div>
         </div>
+      </section>
+
+      <section className="why-section">
+        <p className="eyebrow lime">Why PullUp exists</p>
+        <h2>Plans should not disappear inside group chats.</h2>
+        <p>
+          Feeds keep you scrolling. PullUp gives you a live view of nearby plans, people, and moments worth showing up for, designed for the people who still want the internet to lead somewhere real.
+        </p>
       </section>
 
       <section className="what-section" id="what">
         <p className="eyebrow lime">What is PullUp</p>
         <h2>Real plans. Real people. Right now.</h2>
         <p>
-          PullUp is a live social layer for real life. It shows what is forming nearby, who is open to doing something, and where your friends or circles are creating momentum, without turning discovery into endless scrolling.
+          PullUp is a live social layer for real life. It shows what is forming nearby, who is open to doing something, and where your friends or circles are creating momentum, without turning connection into another feed.
         </p>
       </section>
 
       <section className="how-section" id="how">
         <div className="section-heading">
           <p className="eyebrow cyan">How it works</p>
-          <h2>From maybe later to right now.</h2>
+          <h2>Find the move. Know the people. Pull up.</h2>
         </div>
         <div className="how-grid">
           {howItWorks.map((item) => {
@@ -250,7 +477,7 @@ export default function App() {
       <section className="previews-section" id="previews">
         <div className="section-heading">
           <p className="eyebrow lime">App previews</p>
-          <h2>Designed to make the next move clear.</h2>
+          <h2>Real app moments, shown at iPhone scale.</h2>
         </div>
         <AppPreviewShowcase />
         <div className="preview-strip">
@@ -268,12 +495,16 @@ export default function App() {
         </div>
       </section>
 
+      <section className="share-section" id="share">
+        <ShareWindow />
+      </section>
+
       <section className="philosophy-section">
         <div>
           <MessageCircle size={28} />
           <h2>Social media keeps people online. PullUp helps people show up.</h2>
           <p>
-            Pulling people to real life means less performative posting and more lightweight coordination, trust, and timing. See the signal, choose the plan, and move.
+            Pulling people to real life means less performative posting and more lightweight coordination, trust, and timing. See the signal, choose the plan, and show up while it is still happening.
           </p>
         </div>
         <div className="philosophy-points">
@@ -286,8 +517,8 @@ export default function App() {
 
       <section className="final-cta" id="waitlist">
         <CalendarCheck size={34} />
-        <h2>Pulling people to real life.</h2>
-        <p>Join the waitlist for early access, TestFlight drops, and the first city rollout.</p>
+        <h2>Be first to PullUp.</h2>
+        <p>Get early access, TestFlight drops, and the first city rollout for a social app built around real plans, not passive scrolling.</p>
         <WaitlistForm compact />
       </section>
     </main>
