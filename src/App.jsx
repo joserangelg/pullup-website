@@ -493,7 +493,83 @@ function ShareWindow() {
   );
 }
 
+function InvitePage() {
+  return (
+    <main className="invite-page">
+      <section className="invite-hero">
+        <a href="/" aria-label="PullUp home"><Logo /></a>
+        <div className="invite-layout">
+          <PreviewPhone type="share" />
+          <div className="invite-page-copy">
+            <p className="eyebrow lime">PullUp invite</p>
+            <h1>Matcha Meetup</h1>
+            <p>Nina sent you a PullUp for tonight at 8:00 PM. RSVP from the preview, then open PullUp for the full plan, host approval, and who else is going.</p>
+            <div className="invite-page-actions" aria-label="RSVP options">
+              <button>Going</button>
+              <button>Maybe</button>
+              <button>No</button>
+            </div>
+            <a className="invite-app-link" href="/">Join the early access list</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function LegalPage({ type }) {
+  const isPrivacy = type === 'privacy';
+  return (
+    <main className="legal-page">
+      <nav className="nav legal-nav">
+        <a href="/" aria-label="PullUp home"><Logo /></a>
+        <div>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="/#waitlist">Waitlist</a>
+        </div>
+      </nav>
+      <section className="legal-card">
+        <p className="eyebrow lime">PullUp</p>
+        <h1>{isPrivacy ? 'Privacy Policy' : 'Terms of Use'}</h1>
+        <p className="legal-date">Last updated May 20, 2026</p>
+        {isPrivacy ? (
+          <>
+            <p>PullUp is being prepared for early access. This policy explains how the waitlist site handles information before the app launches.</p>
+            <h2>Information we collect</h2>
+            <p>When you join early access, we collect the email address or phone number you submit, the submission time, and basic technical information needed to run the site.</p>
+            <h2>How we use it</h2>
+            <p>We use waitlist information to send launch updates, beta access, product news, and invite-related communications. We do not sell your waitlist information.</p>
+            <h2>Third-party services</h2>
+            <p>Waitlist submissions are processed through Formspree. Hosting, analytics, email, and app infrastructure may be added as PullUp moves toward beta.</p>
+            <h2>Contact</h2>
+            <p>Questions about privacy can be sent to hello@pullupapp.co.</p>
+          </>
+        ) : (
+          <>
+            <p>These terms cover use of the PullUp coming-soon website and early access waitlist.</p>
+            <h2>Early access</h2>
+            <p>Joining the waitlist does not guarantee beta access, app availability, or a specific launch date. Features shown on the site are previews and may change.</p>
+            <h2>Acceptable use</h2>
+            <p>Do not misuse the site, attempt to disrupt service, submit false information at scale, or use PullUp branding without permission.</p>
+            <h2>Product changes</h2>
+            <p>PullUp is in development. We may update, pause, or change parts of the site, invite flow, and app experience as we build.</p>
+            <h2>Contact</h2>
+            <p>Questions about these terms can be sent to hello@pullupapp.co.</p>
+          </>
+        )}
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
+  const path = window.location.pathname;
+
+  if (path.startsWith('/i/')) return <InvitePage />;
+  if (path === '/privacy') return <LegalPage type="privacy" />;
+  if (path === '/terms') return <LegalPage type="terms" />;
+
   return (
     <main>
       <nav className="nav">
@@ -611,6 +687,15 @@ export default function App() {
         <p>Get early access, TestFlight drops, and the first city rollout for a social app built around real plans, not passive scrolling.</p>
         <WaitlistForm compact />
       </section>
+
+      <footer className="site-footer">
+        <Logo />
+        <div>
+          <a href="/privacy">Privacy</a>
+          <a href="/terms">Terms</a>
+          <a href="mailto:hello@pullupapp.co">Contact</a>
+        </div>
+      </footer>
     </main>
   );
 }

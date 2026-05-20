@@ -1,0 +1,16 @@
+{
+  "name": "PullUp",
+  "short_name": "PullUp",
+  "description": "See what is happening nearby. Real plans, real people, right now.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0B10",
+  "theme_color": "#0B0B10",
+  "icons": [
+    {
+      "src": "/pullup-app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

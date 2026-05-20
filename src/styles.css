@@ -2122,6 +2122,142 @@ h1 {
   text-align: left;
 }
 
+.site-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px clamp(18px, 5vw, 64px) 42px;
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  color: rgba(255, 255, 255, .62);
+}
+
+.site-footer .brand-logo {
+  width: 132px;
+}
+
+.site-footer div {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.site-footer a:hover {
+  color: var(--lime);
+}
+
+.invite-page,
+.legal-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 75% 16%, rgba(0, 212, 255, .12), transparent 30%),
+    radial-gradient(circle at 18% 22%, rgba(198, 255, 0, .12), transparent 28%),
+    #050509;
+}
+
+.invite-hero {
+  min-height: 100vh;
+  padding: 34px clamp(18px, 5vw, 64px) 56px;
+}
+
+.invite-hero > a .brand-logo {
+  width: 174px;
+}
+
+.invite-layout {
+  display: grid;
+  grid-template-columns: minmax(310px, 390px) minmax(0, 680px);
+  gap: clamp(28px, 6vw, 86px);
+  align-items: center;
+  justify-content: center;
+  margin-top: clamp(36px, 8vw, 86px);
+}
+
+.invite-page-copy h1 {
+  max-width: 680px;
+  margin: 14px 0 18px;
+  font-size: clamp(62px, 11vw, 132px);
+  line-height: .86;
+}
+
+.invite-page-copy > p {
+  max-width: 560px;
+  color: #D4D4D8;
+  font-size: clamp(18px, 2.2vw, 23px);
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+.invite-page-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 150px));
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.invite-page-actions button,
+.invite-app-link {
+  min-height: 52px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, .075);
+  color: white;
+  font-weight: 950;
+}
+
+.invite-page-actions button:first-child {
+  border-color: var(--lime);
+  background: var(--lime);
+  color: var(--black);
+}
+
+.invite-app-link {
+  width: fit-content;
+  margin-top: 12px;
+  padding: 0 22px;
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+}
+
+.legal-nav {
+  position: sticky;
+}
+
+.legal-card {
+  width: min(100% - 36px, 860px);
+  margin: 132px auto 64px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .055);
+  padding: clamp(24px, 5vw, 54px);
+}
+
+.legal-card h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(44px, 7vw, 78px);
+  line-height: .92;
+}
+
+.legal-card h2 {
+  margin: 28px 0 8px;
+  font-size: 22px;
+}
+
+.legal-card p {
+  color: #D4D4D8;
+  line-height: 1.65;
+  font-weight: 650;
+}
+
+.legal-date {
+  color: var(--lime) !important;
+  font-size: 13px;
+  font-weight: 900 !important;
+}
+
 @media (max-width: 1180px) {
   .phone-showcase {
     grid-template-columns: 1fr;
@@ -2152,6 +2288,21 @@ h1 {
   .share-copy h2 {
     text-align: center;
   }
+
+  .invite-layout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .invite-page-copy {
+    text-align: center;
+  }
+
+  .invite-page-copy > p,
+  .invite-app-link {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 @media (max-width: 700px) {
@@ -2162,5 +2313,14 @@ h1 {
   .share-card.in-phone h3,
   .invite-screen h3 {
     font-size: 34px;
+  }
+
+  .site-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .invite-page-actions {
+    grid-template-columns: 1fr;
   }
 }

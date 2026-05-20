@@ -7,6 +7,16 @@ const port = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, 'dist');
 const fallbackFile = path.join(publicDir, 'index.html');
 const waitlistWebhookUrl = process.env.WAITLIST_WEBHOOK_URL || 'https://formspree.io/f/mojbjkbn';
+const siteUrl = 'https://pullupapp.co';
+
+const invitePreviews = {
+  'matcha-meetup': {
+    title: 'Matcha Meetup on PullUp',
+    description: 'Nina sent you a PullUp for Matcha Meetup tonight at 8:00 PM. RSVP from the link, then open PullUp for details.',
+    image: `${siteUrl}/pullup-brand-board.png`,
+    url: `${siteUrl}/i/matcha-meetup`
+  }
+};
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -42,6 +52,50 @@ function sendJson(response, statusCode, payload) {
     'Cache-Control': 'no-cache'
   });
   response.end(JSON.stringify(payload));
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function sendHtml(response, html) {
+  response.writeHead(200, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-cache'
+  });
+  response.end(html);
+}
+
+function withPageMeta(html, meta) {
+  const safeTitle = escapeHtml(meta.title);
+  const safeDescription = escapeHtml(meta.description);
+  const safeImage = escapeHtml(meta.image);
+  const safeUrl = escapeHtml(meta.url);
+
+  return html
+    .replace(/<title>.*?<\/title>/, `<title>${safeTitle}</title>`)
+    .replace(/<meta name="description" content=".*?" \/>/, `<meta name="description" content="${safeDescription}" />`)
+    .replace(/<meta property="og:title" content=".*?" \/>/, `<meta property="og:title" content="${safeTitle}" />`)
+    .replace(/<meta property="og:description" content=".*?" \/>/, `<meta property="og:description" content="${safeDescription}" />`)
+    .replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${safeImage}" />`)
+    .replace(/<meta property="og:url" content=".*?" \/>/, `<meta property="og:url" content="${safeUrl}" />`)
+    .replace(/<meta name="twitter:card" content=".*?" \/>/, '<meta name="twitter:card" content="summary_large_image" />');
+}
+
+function sendSpa(response, meta) {
+  fs.readFile(fallbackFile, 'utf8', (error, html) => {
+    if (error) {
+      response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+      response.end('Server error');
+      return;
+    }
+
+    sendHtml(response, meta ? withPageMeta(html, meta) : html);
+  });
 }
 
 function readRequestBody(request, callback) {
@@ -131,6 +185,17 @@ const server = http.createServer((request, response) => {
     return;
   }
 
+  if (url.pathname.startsWith('/i/')) {
+    const slug = url.pathname.split('/').filter(Boolean)[1];
+    sendSpa(response, invitePreviews[slug] || {
+      title: 'You have a PullUp invite',
+      description: 'RSVP from the link, then open PullUp for the full plan and who else is going.',
+      image: `${siteUrl}/pullup-brand-board.png`,
+      url: `${siteUrl}${url.pathname}`
+    });
+    return;
+  }
+
   const decodedPath = decodeURIComponent(url.pathname);
   const requestedPath = decodedPath === '/' ? '/index.html' : decodedPath;
   const filePath = path.normalize(path.join(publicDir, requestedPath));
@@ -147,7 +212,7 @@ const server = http.createServer((request, response) => {
       return;
     }
 
-    sendFile(response, fallbackFile);
+    sendSpa(response);
   });
 });
 
