@@ -269,6 +269,45 @@ function BottomTabs({ active = 'map' }) {
 function PreviewPhone({ type }) {
   if (type === 'share') {
     return (
+      <div className="preview-phone iphone-frame share-phone">
+        <div className="phone-bar" />
+        <div className="message-screen">
+          <div className="message-top">
+            <span>PullUp Invite</span>
+            <b>now</b>
+          </div>
+          <div className="message-bubble">
+            <p>John sent you a PullUp</p>
+            <div className="imessage-preview-card">
+              <div className="share-card-top">
+                <Logo />
+                <span><Link2 size={15} /> pullupapp.co/i/rooftop-hangout</span>
+              </div>
+              <div className="share-pulse">
+                <i />
+                <i />
+                <i />
+              </div>
+              <p className="eyebrow lime">PullUp invite</p>
+              <h3>Rooftop Hangout</h3>
+              <p>Tonight · 7:30 PM · 6 mutuals going</p>
+              <div className="share-rsvp">
+                <button>Going</button>
+                <button>Maybe</button>
+                <button>No</button>
+              </div>
+            </div>
+            <small>Tap to RSVP. Open PullUp for details and who else is going.</small>
+          </div>
+          <button className="share-open">Open PullUp <Send size={15} /></button>
+        </div>
+        <BottomTabs active="map" />
+      </div>
+    );
+  }
+
+  if (type === 'shareLegacy') {
+    return (
       <div className="preview-phone iphone-frame">
         <div className="phone-bar" />
         <div className="share-card in-phone">

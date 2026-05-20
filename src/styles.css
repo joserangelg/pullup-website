@@ -948,6 +948,142 @@ h1 {
   color: white;
 }
 
+.share-phone {
+  background:
+    radial-gradient(circle at 50% 14%, rgba(0, 212, 255, .12), transparent 26%),
+    #07080E;
+}
+
+.message-screen {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 34px);
+  margin-top: 14px;
+  padding: 16px 16px 96px;
+}
+
+.message-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, .62);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.message-top b {
+  color: var(--lime);
+  font-size: 11px;
+}
+
+.message-bubble {
+  width: 100%;
+  margin-top: 20px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 30px;
+  background:
+    linear-gradient(145deg, rgba(36, 37, 48, .96), rgba(14, 15, 22, .98));
+  padding: 14px;
+  box-shadow: 0 24px 58px rgba(0, 0, 0, .34);
+}
+
+.message-bubble > p {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, .82);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.message-bubble small {
+  display: block;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, .54);
+  font-size: 11px;
+  line-height: 1.45;
+  font-weight: 800;
+}
+
+.imessage-preview-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 24px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, .10), rgba(255, 255, 255, .035)),
+    #090A11;
+  padding: 14px;
+}
+
+.imessage-preview-card:before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(198, 255, 0, .17), transparent 36%),
+    linear-gradient(315deg, rgba(0, 212, 255, .14), transparent 38%);
+}
+
+.imessage-preview-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+.imessage-preview-card .share-card-top {
+  margin-bottom: 12px;
+}
+
+.imessage-preview-card .share-card-top .brand-logo {
+  width: 104px;
+}
+
+.imessage-preview-card .share-card-top span {
+  max-width: 134px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 9px;
+  font-size: 9px;
+}
+
+.imessage-preview-card .share-pulse {
+  width: 92px;
+  height: 92px;
+  margin-bottom: 12px;
+}
+
+.imessage-preview-card h3 {
+  margin: 0 0 6px;
+  font-size: 32px;
+  line-height: .95;
+}
+
+.imessage-preview-card > p:not(.eyebrow) {
+  margin: 0;
+  color: rgba(255, 255, 255, .70);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.imessage-preview-card .share-rsvp {
+  margin-top: 14px;
+  gap: 7px;
+}
+
+.imessage-preview-card .share-rsvp button {
+  min-height: 42px;
+  border-radius: 14px;
+  font-size: 12px;
+}
+
+.message-screen > .share-open {
+  margin-top: auto;
+  min-height: 48px;
+  border-radius: 18px;
+}
+
 .share-copy {
   max-width: 760px;
 }
