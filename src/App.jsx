@@ -104,6 +104,7 @@ function Logo() {
 
 function WaitlistForm({ compact = false }) {
   const [status, setStatus] = useState('idle');
+  const [showCelebration, setShowCelebration] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -132,25 +133,61 @@ function WaitlistForm({ compact = false }) {
 
       form.reset();
       setStatus('success');
+      setShowCelebration(true);
     } catch (error) {
       setStatus('error');
     }
   }
 
   return (
-    <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} action={waitlistEndpoint} method="post" onSubmit={handleSubmit}>
-      <div className="waitlist-control">
-        <input name="emailOrPhone" type="text" placeholder="Email or phone" aria-label="Email or phone" required />
-        <button type="submit" disabled={status === 'loading'}>
-          {status === 'loading' ? 'Joining...' : 'Get early access'}
-          <ArrowRight size={18} />
-        </button>
-      </div>
-      <p className={`form-status ${status}`}>
-        {status === 'success' && 'You’re on the list.'}
-        {status === 'error' && 'Something did not go through. Try again in a moment.'}
-      </p>
-    </form>
+    <>
+      <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} action={waitlistEndpoint} method="post" onSubmit={handleSubmit}>
+        <div className="waitlist-control">
+          <input name="emailOrPhone" type="text" placeholder="Email or phone" aria-label="Email or phone" required />
+          <button type="submit" disabled={status === 'loading'}>
+            {status === 'loading' ? 'Joining...' : 'Get early access'}
+            <ArrowRight size={18} />
+          </button>
+        </div>
+        <p className={`form-status ${status}`}>
+          {status === 'success' && 'You’re on the list.'}
+          {status === 'error' && 'Something did not go through. Try again in a moment.'}
+        </p>
+      </form>
+
+      {showCelebration && (
+        <div className="celebration-overlay" role="dialog" aria-modal="true" aria-labelledby="celebration-title">
+          <div className="celebration-card">
+            <div className="celebration-burst" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+            <button className="celebration-close" type="button" aria-label="Close thank you message" onClick={() => setShowCelebration(false)}>
+              ×
+            </button>
+            <div className="celebration-logo">
+              <Logo />
+            </div>
+            <div className="celebration-check">
+              <Check size={22} />
+            </div>
+            <p className="celebration-kicker">You’re early</p>
+            <h3 id="celebration-title">Thank you for joining PullUp.</h3>
+            <p>
+              We can’t wait to launch and pull up together for the next drop. We’ll send news, early access, and the first live invites soon.
+            </p>
+            <button className="celebration-action" type="button" onClick={() => setShowCelebration(false)}>
+              I’m ready
+              <Sparkles size={17} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 

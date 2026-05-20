@@ -247,6 +247,187 @@ h1 {
   color: var(--cyan);
 }
 
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 48% 38%, rgba(198, 255, 0, .16), transparent 28%),
+    radial-gradient(circle at 58% 52%, rgba(0, 212, 255, .14), transparent 24%),
+    rgba(5, 5, 9, .72);
+  backdrop-filter: blur(18px);
+  animation: celebrationFade .24s ease-out;
+}
+
+.celebration-card {
+  position: relative;
+  width: min(100%, 430px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 28px;
+  padding: 30px 26px 26px;
+  background:
+    linear-gradient(145deg, rgba(26, 26, 35, .96), rgba(9, 10, 16, .96)),
+    radial-gradient(circle at 50% 0%, rgba(198, 255, 0, .14), transparent 42%);
+  box-shadow:
+    0 34px 100px rgba(0, 0, 0, .55),
+    0 0 52px rgba(198, 255, 0, .13);
+  text-align: center;
+  animation: celebrationPop .42s cubic-bezier(.16, 1, .3, 1);
+}
+
+.celebration-card:before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 27px;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(198, 255, 0, .18), transparent 32%, rgba(0, 212, 255, .12));
+  opacity: .72;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  padding: 1px;
+}
+
+.celebration-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  color: rgba(255, 255, 255, .76);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.celebration-logo {
+  width: 176px;
+  margin: 0 auto 14px;
+}
+
+.celebration-logo .brand-logo {
+  width: 100%;
+}
+
+.celebration-check {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: var(--lime);
+  color: var(--black);
+  box-shadow: 0 0 34px rgba(198, 255, 0, .35);
+}
+
+.celebration-kicker {
+  margin: 0 0 8px;
+  color: var(--lime);
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.celebration-card h3 {
+  margin: 0 auto 12px;
+  max-width: 340px;
+  color: white;
+  font-size: clamp(28px, 7vw, 40px);
+  line-height: .98;
+  font-weight: 950;
+}
+
+.celebration-card p:not(.celebration-kicker) {
+  margin: 0 auto;
+  max-width: 340px;
+  color: rgba(255, 255, 255, .72);
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.celebration-action {
+  min-height: 48px;
+  margin-top: 22px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 22px;
+  background: linear-gradient(135deg, var(--lime), #9cff4f);
+  color: var(--black);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.celebration-burst {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.celebration-burst span {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--lime);
+  box-shadow: 0 0 18px currentColor;
+  animation: burstFloat 1.55s ease-out infinite;
+}
+
+.celebration-burst span:nth-child(1) {
+  left: 14%;
+  top: 20%;
+  color: var(--lime);
+}
+
+.celebration-burst span:nth-child(2) {
+  left: 80%;
+  top: 26%;
+  color: var(--cyan);
+  animation-delay: .12s;
+}
+
+.celebration-burst span:nth-child(3) {
+  left: 18%;
+  top: 72%;
+  color: var(--violet);
+  animation-delay: .2s;
+}
+
+.celebration-burst span:nth-child(4) {
+  left: 84%;
+  top: 70%;
+  color: var(--lime);
+  animation-delay: .32s;
+}
+
+.celebration-burst span:nth-child(5) {
+  left: 50%;
+  top: 12%;
+  color: var(--cyan);
+  animation-delay: .45s;
+}
+
+.celebration-burst span:nth-child(6) {
+  left: 50%;
+  top: 86%;
+  color: var(--violet);
+  animation-delay: .58s;
+}
+
 .hero-proof {
   display: flex;
   flex-wrap: wrap;
@@ -1067,6 +1248,45 @@ h1 {
 
   50% {
     transform: translate(-50%, -50%) scale(1.035);
+  }
+}
+
+@keyframes celebrationFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes celebrationPop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes burstFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(.7);
+  }
+
+  18%,
+  70% {
+    opacity: .95;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-18px) scale(1.2);
   }
 }
 
