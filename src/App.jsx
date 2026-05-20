@@ -26,7 +26,7 @@ const waitlistEndpoint = '/api/waitlist';
 const activitySignals = [
   { label: 'Rooftop Hangout', meta: 'starts in 22 min · 6 mutuals', x: '68%', y: '36%', tone: 'lime' },
   { label: 'Volleyball Game', meta: '22 open · Green Lake', x: '24%', y: '58%', tone: 'cyan' },
-  { label: 'John Summit Pregame', meta: '3 friends going · Belltown', x: '58%', y: '70%', tone: 'violet' },
+  { label: 'Matcha Meetup', meta: '8 spots · Capitol Hill', x: '58%', y: '70%', tone: 'violet' },
 ];
 
 const howItWorks = [
@@ -77,7 +77,7 @@ const previewCards = [
 const liveFeed = [
   ['Maya joined Rooftop Hangout', 'starts in 22 min'],
   ['Volleyball Game opened', '22 nearby · 4 spots'],
-  ['Leo dropped John Summit Pregame', '3 friends going'],
+  ['Nina dropped Matcha Meetup', '8 spots · waitlist on'],
 ];
 
 const appScreens = [
@@ -273,15 +273,19 @@ function PreviewPhone({ type }) {
         <div className="phone-bar" />
         <div className="message-screen">
           <div className="message-top">
-            <span>PullUp Invite</span>
-            <b>now</b>
+            <span>Messages</span>
+            <b>Today 7:12 PM</b>
+          </div>
+          <div className="text-row incoming">
+            <div className="text-avatar">N</div>
+            <p>Pull up tonight?</p>
           </div>
           <div className="message-bubble">
-            <p>John sent you a PullUp</p>
+            <p>Nina sent you a PullUp</p>
             <div className="imessage-preview-card">
               <div className="share-card-top">
                 <Logo />
-                <span><Link2 size={15} /> pullupapp.co/i/rooftop-hangout</span>
+                <span><Link2 size={15} /> pullupapp.co/i/matcha-meetup</span>
               </div>
               <div className="share-pulse">
                 <i />
@@ -289,8 +293,8 @@ function PreviewPhone({ type }) {
                 <i />
               </div>
               <p className="eyebrow lime">PullUp invite</p>
-              <h3>Rooftop Hangout</h3>
-              <p>Tonight · 7:30 PM · 6 mutuals going</p>
+              <h3>Matcha Meetup</h3>
+              <p>Tonight · 8:00 PM · 6 mutuals going · 8 spots</p>
               <div className="share-rsvp">
                 <button>Going</button>
                 <button>Maybe</button>
@@ -299,9 +303,14 @@ function PreviewPhone({ type }) {
             </div>
             <small>Tap to RSVP. Open PullUp for details and who else is going.</small>
           </div>
-          <button className="share-open">Open PullUp <Send size={15} /></button>
+          <div className="text-row outgoing">
+            <p>I’m in</p>
+          </div>
+          <div className="message-compose">
+            <span>iMessage</span>
+            <Send size={15} />
+          </div>
         </div>
-        <BottomTabs active="map" />
       </div>
     );
   }
@@ -409,7 +418,12 @@ function PreviewPhone({ type }) {
           <div className="drop-card">
             <p className="eyebrow cyan">Drop</p>
             <h4>Create a PullUp in seconds.</h4>
-            <span>Choose vibe, circle, host approval, and time.</span>
+            <span>Choose vibe, circle, host approval, capacity, and whether extra requests go to waitlist.</span>
+            <div className="host-controls" aria-hidden="true">
+              <b>Limit 12</b>
+              <b>8 spots left</b>
+              <b>Waitlist on</b>
+            </div>
           </div>
           <div className="chat-card">
             <p className="eyebrow lime">Chats</p>
