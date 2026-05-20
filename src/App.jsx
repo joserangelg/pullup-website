@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const waitlistEndpoint = 'https://formspree.io/f/mojbjkbn';
+const waitlistEndpoint = '/api/waitlist';
 
 const activitySignals = [
   { label: 'Rooftop Hangout', meta: 'starts in 22 min · 6 mutuals', x: '68%', y: '36%', tone: 'lime' },
@@ -138,7 +138,7 @@ function WaitlistForm({ compact = false }) {
   }
 
   return (
-    <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} onSubmit={handleSubmit}>
+    <form className={compact ? 'waitlist-form compact' : 'waitlist-form'} action={waitlistEndpoint} method="post" onSubmit={handleSubmit}>
       <div className="waitlist-control">
         <input name="emailOrPhone" type="text" placeholder="Email or phone" aria-label="Email or phone" required />
         <button type="submit" disabled={status === 'loading'}>

@@ -6,7 +6,7 @@ const { URL } = require('node:url');
 const port = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, 'dist');
 const fallbackFile = path.join(publicDir, 'index.html');
-const waitlistWebhookUrl = process.env.WAITLIST_WEBHOOK_URL;
+const waitlistWebhookUrl = process.env.WAITLIST_WEBHOOK_URL || 'https://formspree.io/f/mojbjkbn';
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -58,6 +58,15 @@ function readRequestBody(request, callback) {
   request.on('end', () => callback(body));
 }
 
+function parseWaitlistPayload(body, contentType) {
+  if (contentType.includes('application/json')) {
+    return JSON.parse(body || '{}');
+  }
+
+  const params = new URLSearchParams(body);
+  return Object.fromEntries(params.entries());
+}
+
 async function handleWaitlist(request, response) {
   if (request.method !== 'POST') {
     sendJson(response, 405, { error: 'Method not allowed' });
@@ -68,9 +77,9 @@ async function handleWaitlist(request, response) {
     let payload;
 
     try {
-      payload = JSON.parse(body || '{}');
+      payload = parseWaitlistPayload(body, request.headers['content-type'] || '');
     } catch (error) {
-      sendJson(response, 400, { error: 'Invalid JSON' });
+      sendJson(response, 400, { error: 'Invalid waitlist submission' });
       return;
     }
 
@@ -78,12 +87,6 @@ async function handleWaitlist(request, response) {
 
     if (!emailOrPhone) {
       sendJson(response, 400, { error: 'Email or phone is required' });
-      return;
-    }
-
-    if (!waitlistWebhookUrl) {
-      console.log('Waitlist signup received. Set WAITLIST_WEBHOOK_URL to forward it:', emailOrPhone);
-      sendJson(response, 503, { error: 'Waitlist endpoint is not configured' });
       return;
     }
 
